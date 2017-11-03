@@ -143,6 +143,7 @@ def get_stddev(in_dim, out_dim):
 
 # DNN Model Class
 class Classifier:
+    DATA_SIZE = 10
     def __init__(self, hidden_units=[10], n_classes=0):
         self._hidden_units = hidden_units
         self._n_classes = n_classes
