@@ -1,6 +1,35 @@
 import pandas as pd
 from sklearn.cluster import DBSCAN
 from itertools import compress
+
+def plot_confusion_matrix(cm, classes,
+                          normalize=False,
+                          title='Confusion matrix',
+                          cmap=plt.cm.Blues):
+    """
+    This function prints and plots the confusion matrix.
+    Normalization can be applied by setting `normalize=True`.
+    """
+    import matplotlib.pyplot as plt
+    import numpy as np
+    plt.imshow(cm, interpolation='nearest', cmap=cmap,aspect='auto')
+    plt.title(title)
+    plt.colorbar()
+    tick_marks = np.arange(len(classes))
+    plt.xticks(tick_marks, classes, rotation=45)
+    plt.yticks(tick_marks, classes)
+    thresh = cm.max() / 2.
+    for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
+        plt.text(j, i, cm[i, j],
+                 horizontalalignment="center",
+                 color="white" if cm[i, j] > thresh else "black")
+    plt.tight_layout()
+    plt.ylabel('True label')
+    plt.xlabel('Predicted label')
+    plt.savefig('confusion_mat.png', bbox_inches='tight', format='png', dpi=300, pad_inches=0,transparent=True)
+    plt.show()
+    return
+	
 def pdutil_describeItemRange(df):  # Show the number of unique values in each column
     """pdutil_describeItemRange performs is similar to descrive for a DataFrame"""
     """but it displays the number of unique values in each column"""
@@ -186,35 +215,3 @@ class Classifier:
 		train_indices = shuffled_indices[test_set_size:]
 		return data.iloc[train_indices], data.iloc[test_indices], labels.iloc[train_indices], labels.iloc[test_indices]
 
-def plot_confusion_matrix(cm, classes,
-                          normalize=False,
-                          title='Confusion matrix',
-                          cmap=plt.cm.Blues):
-    """
-    This function prints and plots the confusion matrix.
-    Normalization can be applied by setting `normalize=True`.
-    """
-    import matplotlib.pyplot as plt
-    import numpy as np
-    plt.imshow(cm, interpolation='nearest', cmap=cmap,aspect='auto')
-    plt.title(title)
-    plt.colorbar()
-    tick_marks = np.arange(len(classes))
-    plt.xticks(tick_marks, classes, rotation=45)
-    plt.yticks(tick_marks, classes)
-
-    thresh = cm.max() / 2.
-    for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
-        plt.text(j, i, cm[i, j],
-                 horizontalalignment="center",
-                 color="white" if cm[i, j] > thresh else "black")
-
-    plt.tight_layout()
-    plt.ylabel('True label')
-    plt.xlabel('Predicted label')
-    
-    
-    plt.savefig('confusion_mat.png', bbox_inches='tight', format='png', dpi=300, pad_inches=0,transparent=True)
-
-    
-    plt.show()
