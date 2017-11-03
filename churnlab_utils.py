@@ -122,7 +122,7 @@ def load_csv(filename):
     return (data, target)
 
 # output train data 
-def get_batch_data(x_train, y_train, size=None):
+def get_batch_data(x_train, y_train, size=None, class_size):
     if size is None:
         size = len(x_train)
     batch_xs = x_train
@@ -130,19 +130,19 @@ def get_batch_data(x_train, y_train, size=None):
 
     # convert to 1-of-N vector
     for i in range(len(y_train)):
-        val = np.zeros((CLASS_SIZE), dtype=np.float64)
+        val = np.zeros((class_size), dtype=np.float64)
         val[y_train[i]] = 1.0
         batch_ys.append(val)
     batch_ys = np.asarray(batch_ys)
     return batch_xs[:size], batch_ys[:size]
 
 # output test data
-def get_test_data(x_test, y_test):
+def get_test_data(x_test, y_test, class_size):
     batch_ys = []
 
     # convert to 1-of-N vector
     for i in range(len(y_test)):
-        val = np.zeros((CLASS_SIZE), dtype=np.float64)
+        val = np.zeros((class_size), dtype=np.float64)
         val[y_test[i]] = 1.0
         batch_ys.append(val)
     return x_test, np.asarray(batch_ys)
@@ -165,7 +165,7 @@ class Classifier:
 
         # Input Layer
         with tf.name_scope("input"):
-            weights = tf.Variable(tf.truncated_normal([DATA_SIZE, self._hidden_units[0]], stddev=get_stddev(DATA_SIZE, self._hidden_units[0]), seed=42), name='weights')
+            weights = tf.Variable(tf.truncated_normal([self._data_size, self._hidden_units[0]], stddev=get_stddev(self._data_size, self._hidden_units[0]), seed=42), name='weights')
             biases = tf.Variable(tf.zeros([self._hidden_units[0]]), name='biases')
             input = tf.matmul(x, weights) + biases
 
@@ -194,8 +194,8 @@ class Classifier:
     # fitting function for train data
     def fit(self, x_train=None, y_train=None, steps=200):
         # build model
-        x = tf.placeholder(tf.float32, [None, DATA_SIZE])
-        y = tf.placeholder(tf.float32, [None, CLASS_SIZE])
+        x = tf.placeholder(tf.float32, [None, self._data_size])
+        y = tf.placeholder(tf.float32, [None, self._n_classes])
         logits = self.inference(x)
         loss = self.loss(logits, y)
         train_op = tf.train.AdamOptimizer(0.003).minimize(loss)
@@ -212,12 +212,12 @@ class Classifier:
 
         # train
         for i in range(steps):
-            batch_xs, batch_ys = get_batch_data(x_train, y_train)
+            batch_xs, batch_ys = get_batch_data(x_train, y_train, self._n_classes)
             self._sess.run(train_op, feed_dict={x: batch_xs, y: batch_ys})
 
     # evaluation function for test data
     def evaluate(self, x_test=None, y_test=None):
-        x_test, y_test = get_test_data(x_test, y_test)
+        x_test, y_test = get_test_data(x_test, y_test, self._n_classes)
         
         # build accuracy calculate step
         correct_prediction = tf.equal(tf.argmax(self._logits, 1), tf.argmax(self._y, 1))
