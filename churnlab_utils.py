@@ -112,7 +112,7 @@ def load_csv(filename):
     return (data, target)
 
 # output train data 
-def get_batch_data(x_train, y_train, size=None):
+def get_batch_data(x_train, y_train, size=None, n_classes=2):
     if size is None:
         size = len(x_train)
     batch_xs = x_train
@@ -120,19 +120,19 @@ def get_batch_data(x_train, y_train, size=None):
 
     # convert to 1-of-N vector
     for i in range(len(y_train)):
-        val = np.zeros((self._n_classes), dtype=np.float64)
+        val = np.zeros((n_classes), dtype=np.float64)
         val[y_train[i]] = 1.0
         batch_ys.append(val)
     batch_ys = np.asarray(batch_ys)
     return batch_xs[:size], batch_ys[:size]
 
 # output test data
-def get_test_data(x_test, y_test):
+def get_test_data(x_test, y_test, n_classes=2):
     batch_ys = []
 
     # convert to 1-of-N vector
     for i in range(len(y_test)):
-        val = np.zeros((self._n_classes), dtype=np.float64)
+        val = np.zeros((n_classes), dtype=np.float64)
         val[y_test[i]] = 1.0
         batch_ys.append(val)
     return x_test, np.asarray(batch_ys)
