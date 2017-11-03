@@ -44,7 +44,7 @@ def pdutil_describeItemRange(df):  # Show the number of unique values in each co
     """return is smaller dataFrame with the same columns as the original"""
     cols = df.columns.tolist()
     vals = pd.DataFrame ( [ len(set(df[s])) for s in df.columns.tolist()] ).T
-    vals.columns = col
+    vals.columns = cols
     return vals
 
 def pdutil_factorize(df):
