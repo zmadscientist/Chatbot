@@ -168,7 +168,7 @@ class Classifier:
 
         # Input Layer
         with tf.name_scope("input"):
-            weights = tf.Variable(tf.truncated_normal([self._data_size , self._hidden_units[0]], stddev=get_stddev(DATA_SIZE, self._hidden_units[0]), seed=42), name='weights')
+            weights = tf.Variable(tf.truncated_normal([self._data_size , self._hidden_units[0]], stddev=get_stddev(self._data_size, self._hidden_units[0]), seed=42), name='weights')
             biases = tf.Variable(tf.zeros([self._hidden_units[0]]), name='biases')
             input = tf.matmul(x, weights) + biases
 
