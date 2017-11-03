@@ -122,7 +122,7 @@ def load_csv(filename):
     return (data, target)
 
 # output train data 
-def get_batch_data(x_train, y_train, size=None, class_size):
+def get_batch_data(x_train, y_train, size=None, class_size=0):
     if size is None:
         size = len(x_train)
     batch_xs = x_train
@@ -137,7 +137,7 @@ def get_batch_data(x_train, y_train, size=None, class_size):
     return batch_xs[:size], batch_ys[:size]
 
 # output test data
-def get_test_data(x_test, y_test, class_size):
+def get_test_data(x_test, y_test, class_size=0):
     batch_ys = []
 
     # convert to 1-of-N vector
