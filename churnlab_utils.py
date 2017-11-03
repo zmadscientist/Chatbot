@@ -107,7 +107,7 @@ import tensorflow as tf
 import numpy as np
 
 CLASS_SIZE = 2
-DATA_SIZE = 0
+#DATA_SIZE = 0
 
 def load_csv(filename):
     file = pd.read_csv(filename, header=0)
@@ -168,7 +168,7 @@ class Classifier:
 
         # Input Layer
         with tf.name_scope("input"):
-            weights = tf.Variable(tf.truncated_normal([DATA_SIZE, self._hidden_units[0]], stddev=get_stddev(DATA_SIZE, self._hidden_units[0]), seed=42), name='weights')
+            weights = tf.Variable(tf.truncated_normal([self._data_size , self._hidden_units[0]], stddev=get_stddev(DATA_SIZE, self._hidden_units[0]), seed=42), name='weights')
             biases = tf.Variable(tf.zeros([self._hidden_units[0]]), name='biases')
             input = tf.matmul(x, weights) + biases
 
@@ -197,7 +197,7 @@ class Classifier:
     # fitting function for train data
     def fit(self, x_train=None, y_train=None, steps=200):
         # build model
-        x = tf.placeholder(tf.float32, [None, DATA_SIZE])
+        x = tf.placeholder(tf.float32, [None, self._data_size ])
         y = tf.placeholder(tf.float32, [None, CLASS_SIZE])
         logits = self.inference(x)
         loss = self.loss(logits, y)
