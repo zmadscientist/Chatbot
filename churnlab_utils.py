@@ -2,6 +2,12 @@ import pandas as pd
 import numpy as np
 from sklearn.cluster import DBSCAN
 from itertools import compress
+import itertools
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn import svm, datasets
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import confusion_matrix
 
 def plot_confusion_matrix(cm, classes,
                           normalize=False,
