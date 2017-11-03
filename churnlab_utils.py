@@ -13,7 +13,6 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.model_selection import cross_val_score
 from sklearn.metrics import accuracy_score
 import tensorflow as tf
-DATA_SIZE = 10
 	
 def plot_confusion_matrix(cm, classes,
                           normalize=False,
@@ -148,6 +147,8 @@ class Classifier:
         self._hidden_units = hidden_units
         self._n_classes = n_classes
         self._sess = tf.Session()
+	DATA_SIZE = 10
+	CLASS_SIZE = 2
 
     # build model
     def inference(self, x):
