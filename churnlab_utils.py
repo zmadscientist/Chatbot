@@ -120,7 +120,7 @@ def get_batch_data(x_train, y_train, size=None):
 
     # convert to 1-of-N vector
     for i in range(len(y_train)):
-        val = np.zeros((CLASS_SIZE), dtype=np.float64)
+        val = np.zeros((self._n_classes), dtype=np.float64)
         val[y_train[i]] = 1.0
         batch_ys.append(val)
     batch_ys = np.asarray(batch_ys)
@@ -132,7 +132,7 @@ def get_test_data(x_test, y_test):
 
     # convert to 1-of-N vector
     for i in range(len(y_test)):
-        val = np.zeros((CLASS_SIZE), dtype=np.float64)
+        val = np.zeros((self._n_classes), dtype=np.float64)
         val[y_test[i]] = 1.0
         batch_ys.append(val)
     return x_test, np.asarray(batch_ys)
@@ -143,12 +143,12 @@ def get_stddev(in_dim, out_dim):
 
 # DNN Model Class
 class Classifier:
-    def __init__(self, hidden_units=[10], n_classes=0):
+    def __init__(self, hidden_units=[10], n_classes=0, data_size = 0):
         self._hidden_units = hidden_units
         self._n_classes = n_classes
+        self._data_size = data_size	
         self._sess = tf.Session()
-	DATA_SIZE = 10
-	CLASS_SIZE = 2
+
 
     # build model
     def inference(self, x):
@@ -156,7 +156,7 @@ class Classifier:
 
         # Input Layer
         with tf.name_scope("input"):
-            weights = tf.Variable(tf.truncated_normal([DATA_SIZE, self._hidden_units[0]], stddev=get_stddev(DATA_SIZE, self._hidden_units[0]), seed=42), name='weights')
+            weights = tf.Variable(tf.truncated_normal([self._data_size, self._hidden_units[0]], stddev=get_stddev(self._data_size, self._hidden_units[0]), seed=42), name='weights')
             biases = tf.Variable(tf.zeros([self._hidden_units[0]]), name='biases')
             input = tf.matmul(x, weights) + biases
 
@@ -185,8 +185,8 @@ class Classifier:
     # fitting function for train data
     def fit(self, x_train=None, y_train=None, steps=200):
         # build model
-        x = tf.placeholder(tf.float32, [None, DATA_SIZE])
-        y = tf.placeholder(tf.float32, [None, CLASS_SIZE])
+        x = tf.placeholder(tf.float32, [None, self._data_size])
+        y = tf.placeholder(tf.float32, [None, self._n_classes])
         logits = self.inference(x)
         loss = self.loss(logits, y)
         train_op = tf.train.AdamOptimizer(0.003).minimize(loss)
