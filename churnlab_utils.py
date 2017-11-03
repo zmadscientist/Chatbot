@@ -203,12 +203,12 @@ class Classifier:
 
         # train
         for i in range(steps):
-            batch_xs, batch_ys = get_batch_data(x_train, y_train)
+            batch_xs, batch_ys = get_batch_data(x_train, y_train, self._n_classes)
             self._sess.run(train_op, feed_dict={x: batch_xs, y: batch_ys})
 
     # evaluation function for test data
     def evaluate(self, x_test=None, y_test=None):
-        x_test, y_test = get_test_data(x_test, y_test)
+        x_test, y_test = get_test_data(x_test, y_test, self._n_classes)
         
         # build accuracy calculate step
         correct_prediction = tf.equal(tf.argmax(self._logits, 1), tf.argmax(self._y, 1))
