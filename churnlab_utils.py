@@ -8,7 +8,7 @@ def pdutil_describeItemRange(df):  # Show the number of unique values in each co
     """return is smaller dataFrame with the same columns as the original"""
     cols = df.columns.tolist()
     vals = pd.DataFrame ( [ len(set(df[s])) for s in df.columns.tolist()] ).T
-    vals.columns = cols
+    vals.columns = col
     return vals
 
 def pdutil_factorize(df):
@@ -185,7 +185,7 @@ class Classifier:
 		test_indices = shuffled_indices[:test_set_size]
 		train_indices = shuffled_indices[test_set_size:]
 		return data.iloc[train_indices], data.iloc[test_indices], labels.iloc[train_indices], labels.iloc[test_indices]
-import matplotlib.pyplot as plt
+
 def plot_confusion_matrix(cm, classes,
                           normalize=False,
                           title='Confusion matrix',
@@ -194,6 +194,8 @@ def plot_confusion_matrix(cm, classes,
     This function prints and plots the confusion matrix.
     Normalization can be applied by setting `normalize=True`.
     """
+    import matplotlib.pyplot as plt
+    import numpy as np
     plt.imshow(cm, interpolation='nearest', cmap=cmap,aspect='auto')
     plt.title(title)
     plt.colorbar()
