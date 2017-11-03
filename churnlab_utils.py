@@ -95,7 +95,17 @@ def pdutil_dbscan(df, eps_):
     print('eps:{} Estimated number of clusters: {}'.format(eps_, n_clusters_) ) 
     return df, labels, n_clusters_
 
-	
+## import tensorflow as tf
+import numpy as np
+import pandas as pd
+import math
+
+from sklearn.tree import DecisionTreeClassifier 
+from sklearn.model_selection import cross_val_score
+from sklearn.metrics import accuracy_score
+import tensorflow as tf
+import numpy as np
+
 def load_csv(filename):
     file = pd.read_csv(filename, header=0)
 
@@ -112,7 +122,7 @@ def load_csv(filename):
     return (data, target)
 
 # output train data 
-def get_batch_data(x_train, y_train, size=None, n_classes=2):
+def get_batch_data(x_train, y_train, size=None):
     if size is None:
         size = len(x_train)
     batch_xs = x_train
@@ -120,19 +130,19 @@ def get_batch_data(x_train, y_train, size=None, n_classes=2):
 
     # convert to 1-of-N vector
     for i in range(len(y_train)):
-        val = np.zeros((n_classes), dtype=np.float64)
+        val = np.zeros((CLASS_SIZE), dtype=np.float64)
         val[y_train[i]] = 1.0
         batch_ys.append(val)
     batch_ys = np.asarray(batch_ys)
     return batch_xs[:size], batch_ys[:size]
 
 # output test data
-def get_test_data(x_test, y_test, n_classes=2):
+def get_test_data(x_test, y_test):
     batch_ys = []
 
     # convert to 1-of-N vector
     for i in range(len(y_test)):
-        val = np.zeros((n_classes), dtype=np.float64)
+        val = np.zeros((CLASS_SIZE), dtype=np.float64)
         val[y_test[i]] = 1.0
         batch_ys.append(val)
     return x_test, np.asarray(batch_ys)
@@ -146,9 +156,8 @@ class Classifier:
     def __init__(self, hidden_units=[10], n_classes=0, data_size = 0):
         self._hidden_units = hidden_units
         self._n_classes = n_classes
-        self._data_size = data_size	
+        self._data_size = data_size
         self._sess = tf.Session()
-
 
     # build model
     def inference(self, x):
@@ -156,7 +165,7 @@ class Classifier:
 
         # Input Layer
         with tf.name_scope("input"):
-            weights = tf.Variable(tf.truncated_normal([self._data_size, self._hidden_units[0]], stddev=get_stddev(self._data_size, self._hidden_units[0]), seed=42), name='weights')
+            weights = tf.Variable(tf.truncated_normal([DATA_SIZE, self._hidden_units[0]], stddev=get_stddev(DATA_SIZE, self._hidden_units[0]), seed=42), name='weights')
             biases = tf.Variable(tf.zeros([self._hidden_units[0]]), name='biases')
             input = tf.matmul(x, weights) + biases
 
@@ -185,8 +194,8 @@ class Classifier:
     # fitting function for train data
     def fit(self, x_train=None, y_train=None, steps=200):
         # build model
-        x = tf.placeholder(tf.float32, [None, self._data_size])
-        y = tf.placeholder(tf.float32, [None, self._n_classes])
+        x = tf.placeholder(tf.float32, [None, DATA_SIZE])
+        y = tf.placeholder(tf.float32, [None, CLASS_SIZE])
         logits = self.inference(x)
         loss = self.loss(logits, y)
         train_op = tf.train.AdamOptimizer(0.003).minimize(loss)
@@ -203,12 +212,12 @@ class Classifier:
 
         # train
         for i in range(steps):
-            batch_xs, batch_ys = get_batch_data(x_train, y_train, self._n_classes)
+            batch_xs, batch_ys = get_batch_data(x_train, y_train)
             self._sess.run(train_op, feed_dict={x: batch_xs, y: batch_ys})
 
     # evaluation function for test data
     def evaluate(self, x_test=None, y_test=None):
-        x_test, y_test = get_test_data(x_test, y_test, self._n_classes)
+        x_test, y_test = get_test_data(x_test, y_test)
         
         # build accuracy calculate step
         correct_prediction = tf.equal(tf.argmax(self._logits, 1), tf.argmax(self._y, 1))
@@ -217,15 +226,7 @@ class Classifier:
         # evaluate
         return self._sess.run([accuracy], feed_dict={self._x: x_test, self._y: y_test})
 
-    # label prediction
+    # label pridiction
     def predict(self, samples):
         predictions = tf.argmax(self._logits, 1)
         return self._sess.run(predictions, {self._x: samples})
-		
-	def split_train_test2(data, labels, test_ratio):
-		shuffled_indices = np.random.permutation(len(data))
-		test_set_size = int(len(data) * test_ratio)
-		test_indices = shuffled_indices[:test_set_size]
-		train_indices = shuffled_indices[test_set_size:]
-		return data.iloc[train_indices], data.iloc[test_indices], labels.iloc[train_indices], labels.iloc[test_indices]
-
